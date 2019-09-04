@@ -45,22 +45,25 @@ func run(args []string, out io.Writer) error {
 		}
 	case "mute":
 		if len(args) == 1 {
-			return volume.Mute()
+			sink, _ := volume.GetSink()
+			return volume.Mute(sink)
 		}
 	case "unmute":
 		if len(args) == 1 {
-			return volume.Unmute()
+			sink, _ := volume.GetSink()
+			return volume.Unmute(sink)
 		}
 	}
 	return fmt.Errorf("invalid argument for volume: %+v", args)
 }
 
 func printStatus(out io.Writer) error {
-	vol, err := volume.GetVolume()
+	sink, _ := volume.GetSink()
+	vol, err := volume.GetVolume(sink)
 	if err != nil {
 		return err
 	}
-	muted, err := volume.GetMuted()
+	muted, err := volume.GetMuted(sink)
 	if err != nil {
 		return err
 	}
@@ -70,7 +73,8 @@ func printStatus(out io.Writer) error {
 }
 
 func getVolume(out io.Writer) error {
-	vol, err := volume.GetVolume()
+	sink, _ := volume.GetSink()
+	vol, err := volume.GetVolume(sink)
 	if err != nil {
 		return err
 	}
@@ -79,27 +83,30 @@ func getVolume(out io.Writer) error {
 }
 
 func setVolume(volStr string) error {
+	sink, _ := volume.GetSink()
 	vol, err := strconv.Atoi(volStr)
 	if err != nil {
 		return err
 	}
-	return volume.SetVolume(vol)
+	return volume.SetVolume(sink, vol)
 }
 
 func upVolume(diffStr string) error {
+	sink, _ := volume.GetSink()
 	diff, err := strconv.Atoi(diffStr)
 	if err != nil {
 		return err
 	}
-	return volume.IncreaseVolume(diff)
+	return volume.IncreaseVolume(sink, diff)
 }
 
 func downVolume(diffStr string) error {
+	sink, _ := volume.GetSink()
 	diff, err := strconv.Atoi(diffStr)
 	if err != nil {
 		return err
 	}
-	return volume.IncreaseVolume(-diff)
+	return volume.IncreaseVolume(sink, -diff)
 }
 
 func printVersion(out io.Writer) error {

@@ -20,47 +20,56 @@ func execCmd(cmdArgs []string) ([]byte, error) {
 	return out, err
 }
 
+// GetSink returns the sink
+func GetSink() (int, error) {
+	fbSink, err := getFallbackSink()
+	if err != nil {
+		return 0, err
+	}
+	return fbSink, err
+}
+
 // GetVolume returns the current volume (0 to 100).
-func GetVolume() (int, error) {
+func GetVolume(fbSink int) (int, error) {
 	out, err := execCmd(getVolumeCmd())
 	if err != nil {
 		return 0, err
 	}
-	return parseVolume(string(out))
+	return parseVolume(fbSink, string(out))
 }
 
 // SetVolume sets the sound volume to the specified value.
-func SetVolume(volume int) error {
+func SetVolume(fbSink int, volume int) error {
 	if volume < 0 || 100 < volume {
 		return errors.New("out of valid volume range")
 	}
-	_, err := execCmd(setVolumeCmd(volume))
+	_, err := execCmd(setVolumeCmd(fbSink, volume))
 	return err
 }
 
 // IncreaseVolume increases (or decreases) the audio volume by the specified value.
-func IncreaseVolume(diff int) error {
-	_, err := execCmd(increaseVolumeCmd(diff))
+func IncreaseVolume(fbSink int, diff int) error {
+	_, err := execCmd(increaseVolumeCmd(fbSink, diff))
 	return err
 }
 
 // GetMuted returns the current muted status.
-func GetMuted() (bool, error) {
+func GetMuted(fbSink int) (bool, error) {
 	out, err := execCmd(getMutedCmd())
 	if err != nil {
 		return false, err
 	}
-	return parseMuted(string(out))
+	return parseMuted(fbSink, string(out))
 }
 
 // Mute mutes the audio.
-func Mute() error {
-	_, err := execCmd(muteCmd())
+func Mute(fbSink int) error {
+	_, err := execCmd(muteCmd(fbSink))
 	return err
 }
 
 // Unmute unmutes the audio.
-func Unmute() error {
-	_, err := execCmd(unmuteCmd())
+func Unmute(fbSink int) error {
+	_, err := execCmd(unmuteCmd(fbSink))
 	return err
 }
